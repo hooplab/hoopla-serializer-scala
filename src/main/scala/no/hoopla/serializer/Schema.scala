@@ -1,0 +1,10 @@
+package no.hoopla.serializer
+
+trait Schema {
+  def primaryKey: String
+  def typeName: String
+  def attributes: List[String]
+  def relationships: List[Relationship] = List()
+}
+
+case class Relationship(schema: Schema, attribute: String)
