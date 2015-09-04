@@ -18,7 +18,7 @@ class SimpleRelationshipTest extends UnitSpec {
   private val boss = Person(1, None)
   private val personWithBoss = Person(1, Some(boss))
   
-  "A relationship" should "be null if it is None" in {
+  "A relationship" should "be null if the optional value is None" in {
     val serialized = Serializer.serialize(PersonSchema, boss)
 
     (serialized \ "data" \ "relationships" \ "boss" \ "data") shouldBe JNull
