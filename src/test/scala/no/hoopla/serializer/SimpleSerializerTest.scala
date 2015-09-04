@@ -3,13 +3,14 @@ package no.hoopla.serializer
 import org.json4s.JsonDSL._
 import org.json4s._
 
-object SimpleClasses {
-  case object OrganizationSchema extends Schema {
+
+class SimpleSerializerTest extends UnitSpec {
+  private case object OrganizationSchema extends Schema {
     override def primaryKey = "organizationId"
     override def typeName = "organizations"
     override def attributes = List("name", "identifier")
   }
-  case object UserSchema extends Schema {
+  private case object UserSchema extends Schema {
     override def primaryKey = "userId"
     override def typeName = "users"
     override def attributes = List("name")
@@ -17,11 +18,7 @@ object SimpleClasses {
 
   case class User(userId: String, name: String)
   case class Organization(organizationId: String, name: String, identifier: String)
-}
 
-import SimpleClasses._
-
-class SimpleSerializerTest extends UnitSpec {
   it should "serialize a single simple object" in {
 
     val organization = Organization("1", "Brukbar", "brukbar")

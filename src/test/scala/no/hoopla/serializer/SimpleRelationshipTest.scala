@@ -2,19 +2,16 @@ package no.hoopla.serializer
 
 import org.json4s.JsonAST.{JArray, JInt, JNull}
 
-object RelationshipObjects {
-  case object PersonSchema extends Schema {
+
+class SimpleRelationshipTest extends UnitSpec {
+  private case object PersonSchema extends Schema {
     override def primaryKey = "id"
     override def typeName = "persons"
     override def relationships = List(Relationship(PersonSchema, "boss"))
   }
 
-  case class Person(id: Int, boss: Option[Person])
-}
+  private case class Person(id: Int, boss: Option[Person])
 
-import no.hoopla.serializer.RelationshipObjects._
-
-class SimpleRelationshipTest extends UnitSpec {
   private val boss = Person(1, None)
   private val personWithBoss = Person(1, Some(boss))
   
