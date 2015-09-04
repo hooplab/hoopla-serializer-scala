@@ -3,7 +3,7 @@ package no.hoopla.serializer
 trait Schema {
   def primaryKey: String
   def typeName: String
-  def attributes: List[String]
+  def attributes: List[String] = List()
   def relationships: List[Relationship] = List()
 }
 
