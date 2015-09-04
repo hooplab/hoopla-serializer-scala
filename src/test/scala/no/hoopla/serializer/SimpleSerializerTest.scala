@@ -26,7 +26,7 @@ class SimpleSerializerTest extends UnitSpec {
 
     val organization = Organization("1", "Brukbar", "brukbar")
 
-    val serialized = Serializer.serialize(OrganizationSchema, organization)
+    val serialized = Serializer.serialize(OrganizationSchema, organization) \ "data"
 
     assert(serialized \ "id" == JString(organization.organizationId), "Primary keys should be equal")
 
@@ -42,10 +42,10 @@ class SimpleSerializerTest extends UnitSpec {
     val user2 = User("2", "Alice")
     val users = List(user1, user2)
 
-    val serialized = Serializer.serialize(UserSchema, users)
+    val serialized = Serializer.serialize(UserSchema, users) \ "data"
 
     assertResult(serialized, "A list of objects should be serialized the same way as its elements") {
-      JArray(List(Serializer.serialize(UserSchema, user1), Serializer.serialize(UserSchema, user2)))
+      JArray(List(Serializer.serialize(UserSchema, user1) \ "data", Serializer.serialize(UserSchema, user2) \ "data"))
     }
   }
 }
