@@ -12,7 +12,7 @@ import scala.collection.mutable
 object Serializer {
   implicit val formats = Serialization.formats(NoTypeHints)
 
-  class Serializer {
+  private class Serializer {
     private var included = List[JValue]()
     private var visited = Map[String, mutable.Set[JValue]]()
 
