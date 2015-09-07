@@ -16,7 +16,7 @@ object Serializer {
     private var included = List[JValue]()
     private var visited = Map[String, mutable.Set[JValue]]()
 
-    def serialize(schema: Schema, data: JValue): JValue = {
+    def serialize(schema: SchemaBase, data: JValue): JValue = {
       schema.relationships.filter(_.included).foreach(include => {
         addIncluded(include.schema, data \ include.attribute)
       })
@@ -25,7 +25,7 @@ object Serializer {
       ("included" -> included)
     }
 
-    private def addIncluded(schema: Schema, data: JValue): Unit = {
+    private def addIncluded(schema: SchemaBase, data: JValue): Unit = {
       if (data.isInstanceOf[JArray]) {
         data.children.foreach(x => addIncluded(schema, x))
       } else {
@@ -47,14 +47,14 @@ object Serializer {
       }
     }
   }
-  def serialize(schema: Schema, obj: Object): JValue = {
+  def serialize(schema: SchemaBase, obj: Object): JValue = {
     val data = parse(write(obj))
 
     new Serializer().serialize(schema, data)
   }
 
 
-  private def resourceIdentifierObject(schema: Schema, data: JValue): JObject = {
+  private def resourceIdentifierObject(schema: SchemaBase, data: JValue): JObject = {
     ("type" -> schema.typeName) ~
     // TODO : id should always be of type JString
     // jsonapi: Every resource object MUST contain an id member and a type member. The values of the id and type members MUST be strings.
@@ -65,7 +65,7 @@ object Serializer {
     "data" -> relationshipData(rel.schema, data)
   }
 
-  private def relationshipData(schema: Schema, data: JValue): JValue = {
+  private def relationshipData(schema: SchemaBase, data: JValue): JValue = {
     data match {
       case JArray(_) => data.children.map(resourceIdentifierObject(schema, _))
       case JNothing => JNull
@@ -73,9 +73,9 @@ object Serializer {
     }
   }
 
-  private def serializeSchemaData(schema:Schema, data: JValue): JValue = {
+  private def serializeSchemaData(schema:SchemaBase, data: JValue): JValue = {
     data match {
-      case JArray(_) => data.children.map(x ⇒ serializeSchemaData(schema, x))
+      case JArray(_) => data.children.map(x => serializeSchemaData(schema, x))
       case JNothing => JNothing
       case _ =>
         resourceIdentifierObject(schema, data) ~
