@@ -5,7 +5,6 @@ trait Schema {
   def typeName: String
   def attributes: List[String] = List()
   def relationships: List[Relationship] = List()
-  def included: List[Relationship] = List()
 }
 
-case class Relationship(schema: Schema, attribute: String)
+case class Relationship(schema: Schema, attribute: String, included: Boolean = false)

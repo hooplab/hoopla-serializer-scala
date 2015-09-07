@@ -17,7 +17,7 @@ object Serializer {
     private var visited = Map[String, mutable.Set[JValue]]()
 
     def serialize(schema: Schema, data: JValue): JValue = {
-      schema.included.foreach(include => {
+      schema.relationships.filter(_.included).foreach(include => {
         addIncluded(include.schema, data \ include.attribute)
       })
 
@@ -27,26 +27,24 @@ object Serializer {
 
     private def addIncluded(schema: Schema, data: JValue): Unit = {
       if (data.isInstanceOf[JArray]) {
-        data.children.foreach(x ⇒ addIncluded(schema, x))
-        return
+        data.children.foreach(x => addIncluded(schema, x))
+      } else {
+        val typeName = schema.typeName
+        val primaryKey = data \ schema.primaryKey
+
+        if (!visited.contains(typeName))
+          visited += typeName -> mutable.Set()
+
+        if (!visited(typeName).contains(primaryKey)) {
+          visited(typeName) += primaryKey
+
+          included ::= serializeSchemaData(schema, data)
+
+          schema.relationships.filter(_.included).foreach(include => {
+            addIncluded(include.schema, data \ include.attribute)
+          })
+        }
       }
-
-      val typeName = schema.typeName
-      val primaryKey = data \ schema.primaryKey
-
-      if (!visited.contains(typeName))
-        visited += typeName -> mutable.Set()
-
-      if (visited(typeName).contains(primaryKey))
-        return
-
-      visited(typeName) += primaryKey
-
-      included ::= serializeSchemaData(schema, data)
-
-      schema.included.foreach(include => {
-        addIncluded(include.schema, data \ include.attribute)
-      })
     }
   }
   def serialize(schema: Schema, obj: Object): JValue = {
@@ -81,8 +79,8 @@ object Serializer {
       case JNothing => JNothing
       case _ =>
         resourceIdentifierObject(schema, data) ~
-        ("attributes" -> schema.attributes.map(attr ⇒ attr -> data \ attr)) ~
-        ("relationships" -> (schema.relationships union schema.included).map(rel ⇒ rel.attribute -> relationship(rel, data \ rel.attribute)))
+        ("attributes" -> schema.attributes.map(attr => attr -> data \ attr)) ~
+        ("relationships" -> schema.relationships.map(rel => rel.attribute -> relationship(rel, data \ rel.attribute)))
     }
   }
 }
