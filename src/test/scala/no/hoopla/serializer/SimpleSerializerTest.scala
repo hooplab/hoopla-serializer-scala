@@ -2,30 +2,32 @@ package no.hoopla.serializer
 
 import org.json4s.JsonDSL._
 import org.json4s._
+import SimpleSerializerTestData._
 
-
-class SimpleSerializerTest extends UnitSpec {
-  private case object OrganizationSchema extends Schema {
+object SimpleSerializerTestData {
+  case object OrganizationSchema extends Schema[Organization] {
     override def primaryKey = "organizationId"
     override def typeName = "organizations"
     override def attributes = List("name", "identifier")
   }
-  private case object UserSchema extends Schema {
+  case object UserSchema extends Schema[User] {
     override def primaryKey = "userId"
     override def typeName = "users"
     override def attributes = List("name")
   }
 
-  case class User(userId: String, name: String)
-  case class Organization(organizationId: String, name: String, identifier: String)
+  case class User(userId: Long, name: String)
+  case class Organization(organizationId: Long, name: String, identifier: String)
+}
+
+class SimpleSerializerTest extends UnitSpec {
 
   it should "serialize a single simple object" in {
-
-    val organization = Organization("1", "Brukbar", "brukbar")
+    val organization = Organization(1, "Brukbar", "brukbar")
 
     val serialized = Serializer.serialize(OrganizationSchema, organization) \ "data"
 
-    assert(serialized \ "id" == JString(organization.organizationId), "Primary keys should be equal")
+    assert(serialized \ "id" == JInt(organization.organizationId), "Primary keys should be equal")
 
     assertResult(serialized \ "attributes", "Attributes should be extracted") {
       ("name" -> organization.name) ~
@@ -35,8 +37,8 @@ class SimpleSerializerTest extends UnitSpec {
 
   it should "serialize a list of simple objects" in {
 
-    val user1 = User("1", "Bob")
-    val user2 = User("2", "Alice")
+    val user1 = User(1, "Bob")
+    val user2 = User(2, "Alice")
     val users = List(user1, user2)
 
     val serialized = Serializer.serialize(UserSchema, users) \ "data"

@@ -2,19 +2,22 @@ package no.hoopla.serializer
 
 import org.json4s.JsonAST.{JArray, JInt, JNull}
 
+import SimpleRelationshipTestData._
 
-class SimpleRelationshipTest extends UnitSpec {
-  private case object PersonSchema extends Schema {
+object SimpleRelationshipTestData {
+  object PersonSchema extends Schema[Person] {
     override def primaryKey = "id"
     override def typeName = "persons"
     override def relationships = List(Relationship(PersonSchema, "boss"))
   }
 
-  private case class Person(id: Int, boss: Option[Person])
+  case class Person(id: Long, boss: Option[Person])
+}
 
+class SimpleRelationshipTest extends UnitSpec {
   private val boss = Person(1, None)
   private val personWithBoss = Person(1, Some(boss))
-  
+
   "A relationship" should "be null if the optional value is None" in {
     val serialized = Serializer.serialize(PersonSchema, boss)
 
