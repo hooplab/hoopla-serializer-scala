@@ -1,8 +1,8 @@
 package no.hoopla.serializer
 
+import no.hoopla.serializer.SimpleSerializerTestData._
 import org.json4s.JsonDSL._
 import org.json4s._
-import SimpleSerializerTestData._
 
 object SimpleSerializerTestData {
   case object OrganizationSchema extends Schema[Organization] {

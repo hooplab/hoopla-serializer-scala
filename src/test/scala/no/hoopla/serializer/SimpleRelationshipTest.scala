@@ -1,8 +1,7 @@
 package no.hoopla.serializer
 
-import org.json4s.JsonAST.{JString, JArray, JInt, JNull}
-
-import SimpleRelationshipTestData._
+import no.hoopla.serializer.SimpleRelationshipTestData._
+import org.json4s.JsonAST.{JArray, JNull, JString}
 
 object SimpleRelationshipTestData {
   object PersonSchema extends Schema[Person] {
