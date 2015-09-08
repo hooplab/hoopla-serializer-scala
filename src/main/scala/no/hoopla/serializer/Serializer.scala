@@ -13,8 +13,8 @@ object Serializer {
   implicit val formats = Serialization.formats(NoTypeHints)
 
   private class Serializer {
-    private var included = List[JValue]()
-    private var visited = Map[String, mutable.Set[JValue]]()
+    private val included = mutable.MutableList[JValue]()
+    private val visited = mutable.Map[String, mutable.Set[JValue]]()
 
     def serialize(schema: SchemaBase, data: JValue): JValue = {
       schema.relationships.filter(_.included).foreach(include => {
@@ -38,7 +38,7 @@ object Serializer {
         if (!visited(typeName).contains(primaryKey)) {
           visited(typeName) += primaryKey
 
-          included ::= serializeSchemaData(schema, data)
+          included += serializeSchemaData(schema, data)
 
           schema.relationships.filter(_.included).foreach(include => {
             addIncluded(include.schema, data \ include.attribute)
