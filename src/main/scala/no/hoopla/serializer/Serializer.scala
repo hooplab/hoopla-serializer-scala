@@ -36,13 +36,15 @@ object Serializer {
       val typeName = relationshipSchema.typeName
       val primaryKey = relationshipData \ relationshipSchema.primaryKey
 
+      val visitedPrimaryKeys = visited.getOrElse(typeName, Set[JValue]())
+
       // skip the relationship if already added
-      if (!visited.getOrElse(typeName, Set[JValue]()).contains(primaryKey)) {
-        val newVisited = visited.updated(typeName, visited.getOrElse(typeName, (Set[JValue]())) + primaryKey)
+      if (visitedPrimaryKeys.contains(primaryKey)) {
+        (included, visited)
+      } else {
+        val newVisited = visited.updated(typeName, visitedPrimaryKeys + primaryKey)
         val newIncluded = serializeSchemaData(relationshipSchema, relationshipData) :: included
           addAllIncluded(newIncluded, newVisited, relationshipSchema.relationships, relationshipData)
-      } else {
-        (included, visited)
       }
 
     }
