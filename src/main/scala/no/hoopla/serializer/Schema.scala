@@ -3,8 +3,8 @@ package no.hoopla.serializer
 import scala.reflect.runtime.universe._
 
 abstract class Schema[T: TypeTag] extends SchemaBase {
-  def memberIsOfType(member: String, `type`: Type): Boolean = {
-    typeOf[T].member(TermName(member)).typeSignature.resultType == `type`
+  def fieldIsOfType(field: String, t: Type): Boolean = {
+    typeOf[T].member(TermName(field)).typeSignature.resultType == t
   }
 
   private val missingAttrs = (primaryKey :: attributes ::: relationships.map(_.attribute)).filter(memberIsOfType(_, NoType))
