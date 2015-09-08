@@ -1,6 +1,6 @@
 package no.hoopla.serializer
 
-import org.json4s.JsonAST.{JArray, JInt, JNull}
+import org.json4s.JsonAST.{JString, JArray, JInt, JNull}
 
 import SimpleRelationshipTestData._
 
@@ -27,7 +27,7 @@ class SimpleRelationshipTest extends UnitSpec {
   it should "be added to 'relationships'" in {
     val serialized = Serializer.serialize(PersonSchema, personWithBoss)
 
-    assertResult(JInt(boss.id)) {
+    assertResult(JString(boss.id.toString)) {
       serialized \ "data" \ "relationships" \ "boss" \ "data" \ "id"
     }
   }

@@ -56,9 +56,7 @@ object Serializer {
 
   private def resourceIdentifierObject(schema: SchemaBase, data: JValue): JObject = {
     ("type" -> schema.typeName) ~
-    // TODO : id should always be of type JString
-    // jsonapi: Every resource object MUST contain an id member and a type member. The values of the id and type members MUST be strings.
-    ("id" -> data \ schema.primaryKey)
+    ("id" -> JString(compact(render(data \ schema.primaryKey))))
   }
 
   private def relationship(rel: Relationship, data: JValue): JValue = {

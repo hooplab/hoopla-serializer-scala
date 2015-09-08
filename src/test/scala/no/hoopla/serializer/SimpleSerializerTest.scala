@@ -27,7 +27,7 @@ class SimpleSerializerTest extends UnitSpec {
 
     val serialized = Serializer.serialize(OrganizationSchema, organization) \ "data"
 
-    assert(serialized \ "id" == JInt(organization.organizationId), "Primary keys should be equal")
+    assert(serialized \ "id" == JString(organization.organizationId.toString), "Primary keys should be equal")
 
     assertResult(serialized \ "attributes", "Attributes should be extracted") {
       ("name" -> organization.name) ~
