@@ -8,11 +8,11 @@ import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.write
 
 object Serializer {
-  implicit val formats = Serialization.formats(NoTypeHints)
+  private implicit val formats = Serialization.formats(NoTypeHints)
 
-  type Visited = Map[String, Set[JValue]]
-  type Included = List[JValue]
-  type IncludedVisited = (List[JValue], Visited)
+  private type Visited = Map[String, Set[JValue]]
+  private type Included = List[JValue]
+  private type IncludedVisited = (List[JValue], Visited)
 
   def serialize(schema: SchemaBase, obj: Object): JValue = {
     val data = parse(write(obj))
