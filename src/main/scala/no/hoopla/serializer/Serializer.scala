@@ -13,39 +13,41 @@ object Serializer {
   implicit val formats = Serialization.formats(NoTypeHints)
 
   private class Serializer {
-    private var included = List[JValue]()
-    private var visited = Map[String, mutable.Set[JValue]]()
-
     def serialize(schema: SchemaBase, data: JValue): JValue = {
-      schema.relationships.filter(_.included).foreach(include => {
-        addIncluded(include.schema, data \ include.attribute)
-      })
+      val (included, _) = addRelationships(List[JValue](), Map[String, Set[JValue]](), schema.relationships, data)
 
       ("data" -> serializeSchemaData(schema, data)) ~
       ("included" -> included)
     }
+    private def addRelationships(included: List[JValue], visited: Map[String, Set[JValue]], relationships: List[Relationship], data: JValue):
+        (List[JValue], Map[String, Set[JValue]]) =
+      relationships.filter(_.included).foldLeft((included, visited)){case ((included, visited), relationship) =>
+        addRelationship(included, visited, relationship.schema, data \ relationship.attribute)
+      }
 
-    private def addIncluded(schema: SchemaBase, data: JValue): Unit = {
-      if (data.isInstanceOf[JArray]) {
-        data.children.foreach(x => addIncluded(schema, x))
-      } else {
-        val typeName = schema.typeName
-        val primaryKey = data \ schema.primaryKey
 
-        if (!visited.contains(typeName))
-          visited += typeName -> mutable.Set()
 
-        if (!visited(typeName).contains(primaryKey)) {
-          visited(typeName) += primaryKey
+    private def addRelationship(included: List[JValue], visited: Map[String, Set[JValue]], relationshipSchema: SchemaBase, relationshipData: JValue):
+        (List[JValue], Map[String, Set[JValue]]) =
+      if (relationshipData.isInstanceOf[JArray]) {
+        relationshipData.children.foldLeft(included, visited){case ((inc, vis), childData) =>
+          addRelationship(inc, vis, relationshipSchema, childData)
+        }}
+      else {
+        val typeName = relationshipSchema.typeName
+        val primaryKey = relationshipData \ relationshipSchema.primaryKey
 
-          included ::= serializeSchemaData(schema, data)
 
-          schema.relationships.filter(_.included).foreach(include => {
-            addIncluded(include.schema, data \ include.attribute)
-          })
+        // skip the relationship if already added
+        if (visited.contains(typeName) && visited(typeName).contains(primaryKey))
+          (included, visited)
+        else {
+          val newVisited = visited.updated(typeName, visited(typeName) + primaryKey)
+          val newIncluded = serializeSchemaData(relationshipSchema, relationshipData) :: included
+          addRelationships(newIncluded, newVisited, relationshipSchema.relationships, relationshipData)
         }
       }
-    }
+
   }
   def serialize(schema: SchemaBase, obj: Object): JValue = {
     val data = parse(write(obj))
