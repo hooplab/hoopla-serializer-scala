@@ -48,7 +48,6 @@ object Serializer {
           relationshipData
         )
       }
-
     }
 
   /**
