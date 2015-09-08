@@ -14,37 +14,37 @@ object Serializer {
 
   def serialize(schema: SchemaBase, obj: Object): JValue = {
     val data = parse(write(obj))
-    val (included, _) = addRelationships(List[JValue](), Map[String, Set[JValue]](), schema.relationships, data)
+    val (included, _) = addAllIncluded(List[JValue](), Map[String, Set[JValue]](), schema.relationships, data)
 
     ("data" -> serializeSchemaData(schema, data)) ~
     ("included" -> included)
   }
 
-  private def addRelationships(included: List[JValue], visited: Map[String, Set[JValue]], relationships: List[Relationship], data: JValue):
+  private def addAllIncluded(included: List[JValue], visited: Map[String, Set[JValue]], relationships: List[Relationship], data: JValue):
       (List[JValue], Map[String, Set[JValue]]) =
     relationships.filter(_.included).foldLeft((included, visited)){case ((included, visited), relationship) =>
-      addRelationship(included, visited, relationship.schema, data \ relationship.attribute)
+      addIncluded(included, visited, relationship.schema, data \ relationship.attribute)
     }
 
-  private def addRelationship(included: List[JValue], visited: Map[String, Set[JValue]], relationshipSchema: SchemaBase, relationshipData: JValue):
+  private def addIncluded(included: List[JValue], visited: Map[String, Set[JValue]], relationshipSchema: SchemaBase, relationshipData: JValue):
       (List[JValue], Map[String, Set[JValue]]) =
     if (relationshipData.isInstanceOf[JArray]) {
       relationshipData.children.foldLeft(included, visited){case ((inc, vis), childData) =>
-        addRelationship(inc, vis, relationshipSchema, childData)
-      }}
-      else {
-        val typeName = relationshipSchema.typeName
-        val primaryKey = relationshipData \ relationshipSchema.primaryKey
-
-        // skip the relationship if already added
-        if (visited.contains(typeName) && visited(typeName).contains(primaryKey))
-          (included, visited)
-        else {
-          val newVisited = visited.updated(typeName, visited(typeName) + primaryKey)
-          val newIncluded = serializeSchemaData(relationshipSchema, relationshipData) :: included
-          addRelationships(newIncluded, newVisited, relationshipSchema.relationships, relationshipData)
-        }
+        addIncluded(inc, vis, relationshipSchema, childData)
       }
+    } else {
+      val typeName = relationshipSchema.typeName
+      val primaryKey = relationshipData \ relationshipSchema.primaryKey
+
+      // skip the relationship if already added
+      if (visited.contains(typeName) && visited(typeName).contains(primaryKey))
+        (included, visited)
+      else {
+        val newVisited = visited.updated(typeName, visited(typeName) + primaryKey)
+        val newIncluded = serializeSchemaData(relationshipSchema, relationshipData) :: included
+          addAllIncluded(newIncluded, newVisited, relationshipSchema.relationships, relationshipData)
+      }
+    }
 
   /**
     Every resource object MUST contain an id member and a type member. The values of the id and type members MUST be strings.
