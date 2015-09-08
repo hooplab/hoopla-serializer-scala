@@ -7,9 +7,9 @@ abstract class Schema[T: TypeTag] extends SchemaBase {
     typeOf[T].member(TermName(field)).typeSignature.resultType == t
   }
 
-  private val missingAttrs = (primaryKey :: attributes ::: relationships.map(_.attribute)).filter(memberIsOfType(_, NoType))
-  if (missingAttrs.nonEmpty) {
-    throw new RuntimeException(s"Class ${typeOf[T]} is missing the following fields: ${missingAttrs.mkString(", ")}")
+  private val missingFields = (primaryKey :: attributes ::: relationships.map(_.attribute)).filter(fieldIsOfType(_, NoType))
+  if (missingFields.nonEmpty) {
+    throw new NoSuchFieldException(s"Class ${typeOf[T]} is missing the following fields: ${missingFields.mkString(", ")}")
   }
 }
 
