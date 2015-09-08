@@ -7,11 +7,7 @@ abstract class Schema[T: TypeTag] extends SchemaBase {
     typeOf[T].member(TermName(member)).typeSignature.resultType == `type`
   }
 
-  if (!memberIsOfType(primaryKey, typeOf[Long])) {
-    throw new RuntimeException(s"Primary key ('$primaryKey') must be long in class ${typeOf[T]}")
-  }
-
-  private val missingAttrs = (relationships.map(_.attribute) ::: attributes).filter(memberIsOfType(_, NoType))
+  private val missingAttrs = (primaryKey :: attributes ::: relationships.map(_.attribute)).filter(memberIsOfType(_, NoType))
   if (missingAttrs.nonEmpty) {
     throw new RuntimeException(s"Class ${typeOf[T]} is missing the following fields: ${missingAttrs.mkString(", ")}")
   }
