@@ -12,31 +12,29 @@ import scala.collection.mutable
 object Serializer {
   implicit val formats = Serialization.formats(NoTypeHints)
 
-  private class Serializer {
-    def serialize(schema: SchemaBase, data: JValue): JValue = {
-      val (included, _) = addRelationships(List[JValue](), Map[String, Set[JValue]](), schema.relationships, data)
+  def serialize(schema: SchemaBase, obj: Object): JValue = {
+    val data = parse(write(obj))
+    val (included, _) = addRelationships(List[JValue](), Map[String, Set[JValue]](), schema.relationships, data)
 
-      ("data" -> serializeSchemaData(schema, data)) ~
-      ("included" -> included)
+    ("data" -> serializeSchemaData(schema, data)) ~
+    ("included" -> included)
+  }
+
+  private def addRelationships(included: List[JValue], visited: Map[String, Set[JValue]], relationships: List[Relationship], data: JValue):
+      (List[JValue], Map[String, Set[JValue]]) =
+    relationships.filter(_.included).foldLeft((included, visited)){case ((included, visited), relationship) =>
+      addRelationship(included, visited, relationship.schema, data \ relationship.attribute)
     }
-    private def addRelationships(included: List[JValue], visited: Map[String, Set[JValue]], relationships: List[Relationship], data: JValue):
-        (List[JValue], Map[String, Set[JValue]]) =
-      relationships.filter(_.included).foldLeft((included, visited)){case ((included, visited), relationship) =>
-        addRelationship(included, visited, relationship.schema, data \ relationship.attribute)
-      }
 
-
-
-    private def addRelationship(included: List[JValue], visited: Map[String, Set[JValue]], relationshipSchema: SchemaBase, relationshipData: JValue):
-        (List[JValue], Map[String, Set[JValue]]) =
-      if (relationshipData.isInstanceOf[JArray]) {
-        relationshipData.children.foldLeft(included, visited){case ((inc, vis), childData) =>
-          addRelationship(inc, vis, relationshipSchema, childData)
-        }}
+  private def addRelationship(included: List[JValue], visited: Map[String, Set[JValue]], relationshipSchema: SchemaBase, relationshipData: JValue):
+      (List[JValue], Map[String, Set[JValue]]) =
+    if (relationshipData.isInstanceOf[JArray]) {
+      relationshipData.children.foldLeft(included, visited){case ((inc, vis), childData) =>
+        addRelationship(inc, vis, relationshipSchema, childData)
+      }}
       else {
         val typeName = relationshipSchema.typeName
         val primaryKey = relationshipData \ relationshipSchema.primaryKey
-
 
         // skip the relationship if already added
         if (visited.contains(typeName) && visited(typeName).contains(primaryKey))
@@ -47,13 +45,6 @@ object Serializer {
           addRelationships(newIncluded, newVisited, relationshipSchema.relationships, relationshipData)
         }
       }
-
-  }
-  def serialize(schema: SchemaBase, obj: Object): JValue = {
-    val data = parse(write(obj))
-
-    new Serializer().serialize(schema, data)
-  }
 
   /**
     Every resource object MUST contain an id member and a type member. The values of the id and type members MUST be strings.
