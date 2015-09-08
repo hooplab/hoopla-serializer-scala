@@ -53,7 +53,9 @@ object Serializer {
     new Serializer().serialize(schema, data)
   }
 
-
+  /**
+    Every resource object MUST contain an id member and a type member. The values of the id and type members MUST be strings.
+   */
   private def resourceIdentifierObject(schema: SchemaBase, data: JValue): JObject = {
     ("type" -> schema.typeName) ~
     ("id" -> JString(compact(render(data \ schema.primaryKey))))
