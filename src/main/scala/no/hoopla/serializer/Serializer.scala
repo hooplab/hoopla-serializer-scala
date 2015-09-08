@@ -23,8 +23,8 @@ object Serializer {
   }
 
   private def addAllIncluded(included: Included, visited: Visited, relationships: List[Relationship], data: JValue): IncludedVisited =
-    relationships.filter(_.included).foldLeft((included, visited)){ case ((included, visited), relationship) =>
-      addIncluded(included, visited, relationship.schema, data \ relationship.attribute)
+    relationships.filter(_.included).foldLeft((included, visited)){ case ((inc, vis), relationship) =>
+      addIncluded(inc, vis, relationship.schema, data \ relationship.attribute)
     }
 
   private def addIncluded(included: Included, visited: Visited, relationshipSchema: SchemaBase, relationshipData: JValue): IncludedVisited =
