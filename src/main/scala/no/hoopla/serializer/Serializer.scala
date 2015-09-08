@@ -12,6 +12,10 @@ import scala.collection.mutable
 object Serializer {
   implicit val formats = Serialization.formats(NoTypeHints)
 
+  type Visited = Map[String, Set[JValue]]
+  type Included = List[JValue]
+  type IncludedVisited = (List[JValue], Visited)
+
   def serialize(schema: SchemaBase, obj: Object): JValue = {
     val data = parse(write(obj))
     val (included, _) = addAllIncluded(List[JValue](), Map[String, Set[JValue]](), schema.relationships, data)
@@ -20,16 +24,14 @@ object Serializer {
     ("included" -> included)
   }
 
-  private def addAllIncluded(included: List[JValue], visited: Map[String, Set[JValue]], relationships: List[Relationship], data: JValue):
-      (List[JValue], Map[String, Set[JValue]]) =
-    relationships.filter(_.included).foldLeft((included, visited)){case ((included, visited), relationship) =>
+  private def addAllIncluded(included: Included, visited: Visited, relationships: List[Relationship], data: JValue): IncludedVisited =
+    relationships.filter(_.included).foldLeft((included, visited)){ case ((included, visited), relationship) =>
       addIncluded(included, visited, relationship.schema, data \ relationship.attribute)
     }
 
-  private def addIncluded(included: List[JValue], visited: Map[String, Set[JValue]], relationshipSchema: SchemaBase, relationshipData: JValue):
-      (List[JValue], Map[String, Set[JValue]]) =
+  private def addIncluded(included: Included, visited: Visited, relationshipSchema: SchemaBase, relationshipData: JValue): IncludedVisited =
     if (relationshipData.isInstanceOf[JArray]) {
-      relationshipData.children.foldLeft(included, visited){case ((inc, vis), childData) =>
+      relationshipData.children.foldLeft(included, visited){ case ((inc, vis), childData) =>
         addIncluded(inc, vis, relationshipSchema, childData)
       }
     } else {
@@ -38,13 +40,15 @@ object Serializer {
 
       val visitedPrimaryKeys = visited.getOrElse(typeName, Set[JValue]())
 
-      // skip the relationship if already added
       if (visitedPrimaryKeys.contains(primaryKey)) {
         (included, visited)
       } else {
-        val newVisited = visited.updated(typeName, visitedPrimaryKeys + primaryKey)
-        val newIncluded = serializeSchemaData(relationshipSchema, relationshipData) :: included
-          addAllIncluded(newIncluded, newVisited, relationshipSchema.relationships, relationshipData)
+        addAllIncluded(
+          serializeSchemaData(relationshipSchema, relationshipData) :: included,
+          visited.updated(typeName, visitedPrimaryKeys + primaryKey),
+          relationshipSchema.relationships,
+          relationshipData
+        )
       }
 
     }
