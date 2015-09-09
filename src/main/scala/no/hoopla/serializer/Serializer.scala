@@ -50,24 +50,23 @@ object Serializer {
   /**
     Every resource object MUST contain an id member and a type member. The values of the id and type members MUST be strings.
    */
-  private def resourceIdentifierObject(schema: SchemaBase, data: JValue): JObject = {
+  private def resourceIdentifierObject(schema: SchemaBase, data: JValue): JObject =
     ("type" -> schema.typeName) ~
     ("id" -> JString(compact(render(data \ schema.primaryKey))))
-  }
 
-  private def relationship(rel: Relationship, data: JValue): JValue = {
+
+  private def relationship(rel: Relationship, data: JValue): JValue =
     "data" -> relationshipData(rel.schema, data)
-  }
 
-  private def relationshipData(schema: SchemaBase, data: JValue): JValue = {
+
+  private def relationshipData(schema: SchemaBase, data: JValue): JValue =
     data match {
       case JArray(_) => data.children.map(resourceIdentifierObject(schema, _))
       case JNothing => JNull
       case _ => resourceIdentifierObject(schema, data)
     }
-  }
 
-  private def serializeSchemaData(schema:SchemaBase, data: JValue): JValue = {
+  private def serializeSchemaData(schema:SchemaBase, data: JValue): JValue =
     data match {
       case JArray(_) => data.children.map(x => serializeSchemaData(schema, x))
       case JNothing => JNothing
@@ -76,5 +75,4 @@ object Serializer {
         ("attributes" -> schema.attributes.map(attr => attr -> data \ attr)) ~
         ("relationships" -> schema.relationships.map(rel => rel.attribute -> relationship(rel, data \ rel.attribute)))
     }
-  }
 }
