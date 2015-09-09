@@ -13,7 +13,7 @@ no.hoopla.serializer.Serializer contains one public function (serialize) that se
 
 ## API
 A schema is an abstract class with the following fields
-```
+```Scala
 // the name of the primary key
 primaryKey: String
 
@@ -27,7 +27,7 @@ attributes: List[String] = List()
 relationships: List[Relationship] = List()
 ```
 A relationship is a case class for describing how to schemas interact, it contains the following fields:
-```
+```Scala
 // the schema of the related resource
 schema: Schema
 
@@ -36,7 +36,7 @@ attribute: String
 
 // whether to include the data in the output, defaults to false.
 included: Boolean = false
-```
+```Scala
 ## Example Usage
 ```
 package no.hoopla.bearializer
@@ -72,7 +72,7 @@ object SerializationExample extends App {
 }
 ```
 Expected output:
-```
+```JSON
 {
   "data" : {
     "type" : "persons",
