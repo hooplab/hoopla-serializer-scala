@@ -4,6 +4,9 @@ hoopla-serializer-scala
 
 [![Build Status](https://ci.hoopladev.no/buildStatus/icon?job=hoopla-serializer-scala)](https://ci.hoopladev.no/job/hoopla-serializer-scala/)
 
+[![Coverage Status](https://coveralls.io/repos/hooplab/hoopla-serializer-scala/badge.svg?branch=a030deb0822a1d3bf5cabd06258e5483ee904f1e&service=github)](https://coveralls.io/github/hooplab/hoopla-serializer-scala?branch=a030deb0822a1d3bf5cabd06258e5483ee904f1e)
+
+
 ## jsonapi
 hoopla-serializer-scala is a jsonapi.org serializer, given a json4s format it will produce valid json4s output.
 
