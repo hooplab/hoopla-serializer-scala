@@ -1,3 +1,5 @@
+import org.scoverage.coveralls.Imports.CoverallsKeys._
+
 name := "api"
 
 organization := "no.hoopla"
@@ -20,3 +22,5 @@ libraryDependencies ++= {
 }
 
 parallelExecution in Test := false
+
+coverallsTokenFile := Some("coveralls-api-key")
