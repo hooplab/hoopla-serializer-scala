@@ -7,13 +7,13 @@ import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.write
 
 object Serializer {
-  private implicit val formats = Serialization.formats(NoTypeHints)
+  //private implicit val formats = Serialization.formats(NoTypeHints)
 
   private type Visited = Map[String, Set[JValue]]
   private type Included = List[JValue]
   private type IncludedVisited = (List[JValue], Visited)
 
-  def serialize(schema: SchemaBase, obj: Object): JValue = {
+  def serialize(schema: SchemaBase, obj: Object)(implicit formats: org.json4s.Formats = Serialization.formats(NoTypeHints)): JValue = {
     val data = parse(write(obj))
     val (included, _) = addAllIncluded(List[JValue](), Map[String, Set[JValue]](), schema.relationships, data)
 
