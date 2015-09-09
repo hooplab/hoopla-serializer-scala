@@ -9,7 +9,7 @@ case class MissingFieldsException(t: Type, missingFields: List[String]) extends 
 )
 
 abstract class Schema[T: TypeTag] extends SchemaBase {
-  private def validateSchema(): Unit = {
+  private def validate(): Unit = {
     def fieldIsMissingInModel(field: String): Boolean =
       typeOf[T].member(TermName(field)).typeSignature.resultType == NoType
 
@@ -20,7 +20,7 @@ abstract class Schema[T: TypeTag] extends SchemaBase {
       throw MissingFieldsException(typeOf[T], missingFields)
     }
   }
-  validateSchema()
+  validate()
 }
 
 sealed trait SchemaBase {
