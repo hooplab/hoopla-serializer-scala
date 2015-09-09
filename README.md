@@ -14,16 +14,28 @@ no.hoopla.serializer.Serializer contains one public function (serialize) that se
 ## API
 A schema is an abstract class with the following fields
 ```
-primaryKey: String // the name of the primary key
-typeName: String // the name of the type to serialize
-attributes: List[String] = List() // names of attributes or fields in the class to include, defaults to empty
-relationships: List[Relationship] = List() // relationships to include, defaults to empty
+// the name of the primary key
+primaryKey: String
+
+// the name of the type to serialize
+typeName: String
+
+// names of attributes or fields in the class to include, defaults to empty
+attributes: List[String] = List()
+
+// relationships to include, defaults to empty
+relationships: List[Relationship] = List()
 ```
 A relationship is a case class for describing how to schemas interact, it contains the following fields:
 ```
-schema: Schema // the schema of the related resource
-attribute: String // the attribute of the relatee that the related resource is structured under
-included: Boolean = false // whether to include the data in the output, defaults to false.
+// the schema of the related resource
+schema: Schema
+
+// the attribute of the relatee that the related resource is structured under
+attribute: String
+
+// whether to include the data in the output, defaults to false.
+included: Boolean = false
 ```
 ## Example Usage
 ```
