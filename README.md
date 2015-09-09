@@ -31,7 +31,7 @@ A relationship is a case class for describing how schemas interact, containing t
 // the schema of the related resource
 schema: Schema
 
-// the attribute of the relatee that the related resource is structured under
+// the field in the model that is serialized with this relationship's schema.
 attribute: String
 
 // whether to include the data in the output, defaults to false.
@@ -51,7 +51,7 @@ object SerializationExample extends App {
   object PersonSchema extends Schema[Person] {
     override def primaryKey = "id"
     override def typeName = "persons"
-    // attributes defaults to empty list, don't override.
+    // include name in the json output.
     override def attributes = List("name")
     // a Person may have a boss, include it in output
     override def relationships = List(Relationship(PersonSchema, "supervisor", included=true))
