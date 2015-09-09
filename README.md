@@ -26,7 +26,7 @@ attributes: List[String] = List()
 // relationships to include, defaults to empty
 relationships: List[Relationship] = List()
 ```
-A relationship is a case class for describing how to schemas interact, it contains the following fields:
+A relationship is a case class for describing how schemas interact, containing the following fields:
 ```Scala
 // the schema of the related resource
 schema: Schema
@@ -36,11 +36,9 @@ attribute: String
 
 // whether to include the data in the output, defaults to false.
 included: Boolean = false
-```Scala
-## Example Usage
 ```
-package no.hoopla.bearializer
-
+## Example Usage
+```Scala
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import no.hoopla.serializer._
@@ -72,7 +70,7 @@ object SerializationExample extends App {
 }
 ```
 Expected output:
-```JSON
+```JavaScript
 {
   "data" : {
     "type" : "persons",
