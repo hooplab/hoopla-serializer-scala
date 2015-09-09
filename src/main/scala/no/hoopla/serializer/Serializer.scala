@@ -11,7 +11,7 @@ object Serializer {
   private type Included = List[JValue]
   private type IncludedVisited = (List[JValue], Visited)
 
-  def serialize(schema: SchemaBase, obj: Object)(implicit formats: org.json4s.Formats = Serialization.formats(NoTypeHints)): JValue = {
+  def serialize(schema: SchemaBase, obj: Object)(implicit formats: Formats = Serialization.formats(NoTypeHints)): JValue = {
     val data = parse(write(obj))
     val (included, _) = addAllIncluded(List[JValue](), Map[String, Set[JValue]](), schema.relationships, data)
 
