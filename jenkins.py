@@ -16,6 +16,6 @@ if (not proc.returncode == 0):
     raise Exception("Some tests failed!")
 
 #Assumption: the keyfile has been added to the repo at the CI server.
-loggin.info("Submitting test coverage to coveralls.io...")
+logging.info("Submitting test coverage to coveralls.io...")
 proc = subprocess.Popen(["sbt", "coveralls"], shell=False)
 proc.communicate()
