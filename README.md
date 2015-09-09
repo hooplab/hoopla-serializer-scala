@@ -47,22 +47,22 @@ import no.hoopla.serializer._
 
 object SerializationExample extends App {
   // the case class to serialize
-  case class Person(id: Long, supervisor: Option[Person])
+  case class Person(id: Long, name: String, supervisor: Option[Person])
 
   // the schema
   object PersonSchema extends Schema[Person] {
     override def primaryKey = "id"
     override def typeName = "persons"
     // attributes defaults to empty list, don't override.
-
+    override def attributes = List("name")
     // a Person may have a boss, include it in output
     override def relationships = List(Relationship(PersonSchema, "supervisor", included=true))
   }
 
   // the data
-  val executiveErica = Person(3, None)
-  val middleManagementMark = Person(2, Some(executiveErica))
-  val builderBob = Person(1, Some(middleManagementMark))
+  val executiveErica = Person(3, "Erica the Eldricht", None)
+  val middleManagementMark = Person(2, "Mark the Magniloquent", Some(executiveErica))
+  val builderBob = Person(1, "Bob the Bacciferous", Some(middleManagementMark))
 
   // serialize!
   val jsonOutput: JValue = Serializer.serialize(PersonSchema, builderBob)
@@ -70,7 +70,6 @@ object SerializationExample extends App {
   // pretty print output
   println(pretty(render(jsonOutput)))
 }
-
 ```
 Expected output:
 ```
@@ -78,7 +77,9 @@ Expected output:
   "data" : {
     "type" : "persons",
     "id" : "1",
-    "attributes" : { },
+    "attributes" : {
+      "name" : "Bob the Bacciferous"
+    },
     "relationships" : {
       "supervisor" : {
         "data" : {
@@ -91,7 +92,9 @@ Expected output:
   "included" : [ {
     "type" : "persons",
     "id" : "3",
-    "attributes" : { },
+    "attributes" : {
+      "name" : "Erica the Eldricht"
+    },
     "relationships" : {
       "supervisor" : {
         "data" : null
@@ -100,7 +103,9 @@ Expected output:
   }, {
     "type" : "persons",
     "id" : "2",
-    "attributes" : { },
+    "attributes" : {
+      "name" : "Mark the Magniloquent"
+    },
     "relationships" : {
       "supervisor" : {
         "data" : {
