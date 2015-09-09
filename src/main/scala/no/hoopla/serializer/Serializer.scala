@@ -7,8 +7,6 @@ import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.write
 
 object Serializer {
-  //private implicit val formats = Serialization.formats(NoTypeHints)
-
   private type Visited = Map[String, Set[JValue]]
   private type Included = List[JValue]
   private type IncludedVisited = (List[JValue], Visited)
