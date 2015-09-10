@@ -28,7 +28,7 @@ object IncludedTestData {
 }
 
 class IncludedTest extends UnitSpec {
-  private def identifiesAs(typeName: String, id: Any)(x:JValue): Boolean = {
+  private[this] def identifiesAs(typeName: String, id: Any)(x:JValue): Boolean = {
     x \ "type" == JString(typeName) && x \ "id" == JString(id.toString)
   }
 

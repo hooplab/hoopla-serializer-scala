@@ -3,16 +3,16 @@ package no.hoopla.serializer
 class SchemaValidationTest extends UnitSpec {
 
   // BlankSchema is a valid schema used for testing references
-  private case class Blank(id: String)
-  private object BlankSchema extends Schema[Blank] {
+  private[this] case class Blank(id: String)
+  private[this] object BlankSchema extends Schema[Blank] {
     override def primaryKey: String = "id"
     override def typeName: String = ""
   }
 
-  private case class Person(id: String)
+  private[this] case class Person(id: String)
 
   // Schema matching Person. Overriding in tests to create exceptions
-  private abstract class CorrectPersonSchema extends Schema[Person] {
+  private[this] abstract class CorrectPersonSchema extends Schema[Person] {
     override def primaryKey = "id"
     override def typeName = "persons"
     override def attributes = List[String]()

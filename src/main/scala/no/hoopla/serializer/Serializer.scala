@@ -7,9 +7,9 @@ import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.write
 
 object Serializer {
-  private type Visited = Map[String, Set[JValue]]
-  private type Included = List[JValue]
-  private type IncludedVisited = (List[JValue], Visited)
+  private[this] type Visited = Map[String, Set[JValue]]
+  private[this] type Included = List[JValue]
+  private[this] type IncludedVisited = (List[JValue], Visited)
 
   def serialize(schema: SchemaBase, obj: Object)(implicit formats: Formats = Serialization.formats(NoTypeHints)): JValue = {
     val data = parse(write(obj))
@@ -19,12 +19,12 @@ object Serializer {
     ("included" -> included)
   }
 
-  private def addAllIncluded(included: Included, visited: Visited, relationships: List[Relationship], data: JValue): IncludedVisited =
+  private[this] def addAllIncluded(included: Included, visited: Visited, relationships: List[Relationship], data: JValue): IncludedVisited =
     relationships.filter(_.included).foldLeft((included, visited)){ case ((inc, vis), relationship) =>
       addIncluded(inc, vis, relationship.schema, data \ relationship.attribute)
     }
 
-  private def addIncluded(included: Included, visited: Visited, relationshipSchema: SchemaBase, relationshipData: JValue): IncludedVisited =
+  private[this] def addIncluded(included: Included, visited: Visited, relationshipSchema: SchemaBase, relationshipData: JValue): IncludedVisited =
     if (relationshipData.isInstanceOf[JArray]) {
       relationshipData.children.foldLeft(included, visited){ case ((inc, vis), childData) =>
         addIncluded(inc, vis, relationshipSchema, childData)
@@ -50,23 +50,23 @@ object Serializer {
   /**
     Every resource object MUST contain an id member and a type member. The values of the id and type members MUST be strings.
    */
-  private def resourceIdentifierObject(schema: SchemaBase, data: JValue): JObject =
+  private[this] def resourceIdentifierObject(schema: SchemaBase, data: JValue): JObject =
     ("type" -> schema.typeName) ~
     ("id" -> JString(compact(render(data \ schema.primaryKey))))
 
 
-  private def relationship(rel: Relationship, data: JValue): JValue =
+  private[this] def relationship(rel: Relationship, data: JValue): JValue =
     "data" -> relationshipData(rel.schema, data)
 
 
-  private def relationshipData(schema: SchemaBase, data: JValue): JValue =
+  private[this] def relationshipData(schema: SchemaBase, data: JValue): JValue =
     data match {
       case JArray(_) => data.children.map(resourceIdentifierObject(schema, _))
       case JNothing => JNull
       case _ => resourceIdentifierObject(schema, data)
     }
 
-  private def serializeSchemaData(schema:SchemaBase, data: JValue): JValue =
+  private[this] def serializeSchemaData(schema:SchemaBase, data: JValue): JValue =
     data match {
       case JArray(_) => data.children.map(x => serializeSchemaData(schema, x))
       case JNothing => JNothing

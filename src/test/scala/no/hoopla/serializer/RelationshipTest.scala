@@ -30,8 +30,8 @@ object RelationshipTestData {
 }
 
 class RelationshipTest extends UnitSpec {
-  private val boss = Person(1, None)
-  private val personWithBoss = Person(2, Some(boss))
+  private[this] val boss = Person(1, None)
+  private[this] val personWithBoss = Person(2, Some(boss))
 
   "A relationship" should "be null if the optional value is None" in {
     val serialized = Serializer.serialize(PersonSchema, boss)
