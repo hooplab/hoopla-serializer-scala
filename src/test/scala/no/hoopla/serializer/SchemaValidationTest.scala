@@ -15,8 +15,8 @@ class SchemaValidationTest extends UnitSpec {
   private[this] abstract class CorrectPersonSchema extends Schema[Person] {
     override def primaryKey: String = "id"
     override def typeName: String = "persons"
-    override def attributes: List[String] = List[String]()
-    override def relationships: List[Relationship]  = List[Relationship]()
+    override def attributes: List[String] = List()
+    override def relationships: List[Relationship]  = List()
   }
 
   /*
