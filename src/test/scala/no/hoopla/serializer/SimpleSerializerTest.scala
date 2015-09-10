@@ -6,14 +6,14 @@ import org.json4s._
 
 object SimpleSerializerTestData {
   case object OrganizationSchema extends Schema[Organization] {
-    override def primaryKey = "organizationId"
-    override def typeName = "organizations"
-    override def attributes = List("name", "identifier")
+    override def primaryKey: String = "organizationId"
+    override def typeName: String = "organizations"
+    override def attributes: List[String] = List("name", "identifier")
   }
   case object UserSchema extends Schema[User] {
-    override def primaryKey = "userId"
-    override def typeName = "users"
-    override def attributes = List("name")
+    override def primaryKey: String = "userId"
+    override def typeName: String = "users"
+    override def attributes: List[String] = List("name")
   }
 
   case class User(userId: Long, name: String)

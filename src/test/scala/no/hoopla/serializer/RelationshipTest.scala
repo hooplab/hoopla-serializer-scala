@@ -5,25 +5,25 @@ import org.json4s.JsonAST.{JArray, JNull, JString, JObject}
 
 object RelationshipTestData {
   object PersonSchema extends Schema[Person] {
-    override def primaryKey = "id"
-    override def typeName = "persons"
-    override def relationships = List(Relationship(PersonSchema, "boss"))
+    override def primaryKey: String = "id"
+    override def typeName: String = "persons"
+    override def relationships: List[Relationship] = List(Relationship(PersonSchema, "boss"))
   }
 
   case class Person(id: Long, boss: Option[Person])
 
   object ReproductivePersonSchema extends Schema[ReproductivePerson] {
-    override def primaryKey = "id"
-    override def typeName = "reproductivePersons"
-    override def relationships = List(Relationship(ReproductivePersonSchema, "children"))
+    override def primaryKey: String = "id"
+    override def typeName: String = "reproductivePersons"
+    override def relationships: List[Relationship] = List(Relationship(ReproductivePersonSchema, "children"))
   }
 
   case class ReproductivePerson(id: Long, children: List[ReproductivePerson])
 
   object ReproductivePersonSchema2 extends Schema[ReproductivePerson2] {
-    override def primaryKey = "id"
-    override def typeName = "reproductivePersons"
-    override def relationships = List(Relationship(ReproductivePersonSchema2, "children"))
+    override def primaryKey: String = "id"
+    override def typeName: String = "reproductivePersons"
+    override def relationships: List[Relationship] = List(Relationship(ReproductivePersonSchema2, "children"))
   }
 
   case class ReproductivePerson2(id: Long, children: List[Option[ReproductivePerson2]])

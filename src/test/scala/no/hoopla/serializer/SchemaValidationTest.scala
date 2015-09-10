@@ -13,10 +13,10 @@ class SchemaValidationTest extends UnitSpec {
 
   // Schema matching Person. Overriding in tests to create exceptions
   private[this] abstract class CorrectPersonSchema extends Schema[Person] {
-    override def primaryKey = "id"
-    override def typeName = "persons"
-    override def attributes = List[String]()
-    override def relationships  = List[Relationship]()
+    override def primaryKey: String = "id"
+    override def typeName: String = "persons"
+    override def attributes: List[String] = List[String]()
+    override def relationships: List[Relationship]  = List[Relationship]()
   }
 
   /*
@@ -43,7 +43,7 @@ class SchemaValidationTest extends UnitSpec {
 
     val thrown = intercept[MissingFieldsException] {
       object PersonSchema extends CorrectPersonSchema {
-        override def attributes = missingAttributes
+        override def attributes: List[String] = missingAttributes
       }
       val a = PersonSchema
     }
@@ -56,7 +56,7 @@ class SchemaValidationTest extends UnitSpec {
 
     val thrown = intercept[MissingFieldsException] {
       object PersonSchema extends CorrectPersonSchema {
-        override def relationships = missingRelationshipAttributes.map(Relationship(BlankSchema, _))
+        override def relationships: List[Relationship] = missingRelationshipAttributes.map(Relationship(BlankSchema, _))
       }
       val a = PersonSchema
     }
@@ -73,9 +73,9 @@ class SchemaValidationTest extends UnitSpec {
 
     val thrown = intercept[MissingFieldsException] {
       object PersonSchema extends CorrectPersonSchema {
-        override def primaryKey = mismatchingPrimaryKey
-        override def attributes = missingAttributes
-        override def relationships = missingRelationshipAttributes.map(Relationship(BlankSchema, _))
+        override def primaryKey: String = mismatchingPrimaryKey
+        override def attributes: List[String] = missingAttributes
+        override def relationships: List[Relationship] = missingRelationshipAttributes.map(Relationship(BlankSchema, _))
       }
       val a = PersonSchema
     }

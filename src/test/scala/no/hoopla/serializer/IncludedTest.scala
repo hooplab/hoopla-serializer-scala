@@ -5,9 +5,9 @@ import org.json4s._
 
 object IncludedTestData {
   object PersonSchema extends Schema[Person] {
-    override def primaryKey = "id"
-    override def typeName = "persons"
-    override def relationships = List(Relationship(PersonSchema, "boss", included=true))
+    override def primaryKey: String = "id"
+    override def typeName: String = "persons"
+    override def relationships: List[Relationship] = List(Relationship(PersonSchema, "boss", included=true))
   }
   case class Person(id: Long, boss: Option[Person])
 
@@ -16,9 +16,9 @@ object IncludedTestData {
     override def typeName: String = "users"
   }
   object OrganizationSchema extends Schema[Organization] {
-    override def primaryKey = "organizationId"
-    override def typeName = "organizations"
-    override def relationships = List(
+    override def primaryKey: String = "organizationId"
+    override def typeName: String = "organizations"
+    override def relationships: List[Relationship] = List(
       Relationship(UserSchema, "admin", included=true),
       Relationship(UserSchema, "members", included=true)
     )
