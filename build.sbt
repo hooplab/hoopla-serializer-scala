@@ -1,6 +1,6 @@
 import org.scoverage.coveralls.Imports.CoverallsKeys._
 
-name := "api"
+name := "serializer"
 
 organization := "no.hoopla"
 
