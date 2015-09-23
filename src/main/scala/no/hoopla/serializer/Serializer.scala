@@ -11,7 +11,17 @@ object Serializer {
   private[this] type Included = List[JValue]
   private[this] type IncludedVisited = (List[JValue], Visited)
 
-  def serialize(schema: SchemaBase, obj: Object)(implicit formats: Formats = Serialization.formats(NoTypeHints)): JValue = {
+  private[this] implicit val formats: Formats = Serialization.formats(NoTypeHints)
+
+  def serialize[T <: AnyRef](schema: Schema[T], obj: T) = {
+    toJsonApi(schema, obj)
+  }
+
+  def serialize[T <: AnyRef](schema: Schema[T], iterable: Iterable[T]) = {
+    toJsonApi(schema, iterable)
+  }
+
+  private[this] def toJsonApi(schema: SchemaBase, obj: AnyRef): JValue = {
     val data = parse(write(obj))
     val (included, _) = addAllIncluded(List[JValue](), Map[String, Set[JValue]](), schema.relationships, data)
 
