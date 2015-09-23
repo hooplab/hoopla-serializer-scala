@@ -23,7 +23,7 @@ abstract class Schema[T: TypeTag] extends SchemaBase {
   validate()
 }
 
-sealed trait SchemaBase {
+protected sealed trait SchemaBase {
   def primaryKey: String
   def typeName: String
   def attributes: List[String] = List()
