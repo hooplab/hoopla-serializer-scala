@@ -13,11 +13,11 @@ object Serializer {
 
   private[this] implicit val formats: Formats = Serialization.formats(NoTypeHints)
 
-  def serialize[T <: AnyRef](schema: Schema[T], obj: T) = {
+  def serialize[T <: AnyRef](schema: Schema[T], obj: T): JValue = {
     toJsonApi(schema, obj)
   }
 
-  def serialize[T <: AnyRef](schema: Schema[T], iterable: Iterable[T]) = {
+  def serialize[T <: AnyRef](schema: Schema[T], iterable: Iterable[T]): JValue = {
     toJsonApi(schema, iterable)
   }
 
