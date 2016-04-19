@@ -59,13 +59,29 @@ object ValidateSchema {
 
     annottees.map(_.tree) match {
       case (objectDecl: ModuleDef) :: Nil => {
+        println(objectDecl.impl)
         traverser.traverse(objectDecl)
-        println(traverser.baseTypeName)
-        println(traverser.primaryKeyName)
-        println(traverser.typeName)
-        println(traverser.attributes)
-        println(traverser.relationships)
 
+        val baseTypeName: String = traverser.baseTypeName
+        val primaryKeyName: String = traverser.primaryKeyName
+        val typeName: String = traverser.typeName
+        val attributes: List[String] = traverser.attributes
+        val relationships: List[Relationship] = traverser.relationships
+
+        val requiredAttributes: Set[String] =
+          attributes.toSet ++ relationships.map(_.attribute).toSet + primaryKeyName
+
+        val k = c.asInstanceOf[scala.reflect.macros.contexts.Context]
+        locally {
+          import k.universe._
+          val n = k.callsiteTyper.typed(q"??? : ${TypeName(traverser.baseTypeName)}").tpe
+          //println(attributes)
+          //println(requiredAttributes)
+          //requiredAttributes.foreach(attribute =>
+          //  println(s"hh: ${n.member(TermName(attribute))}"))
+          //println(n.member(TermName("id")))
+          println(n)
+        }
         ???
       }
 

@@ -20,6 +20,7 @@ class SchemaMacroValidationTest extends UnitSpec {
     case object BlankSchema extends Schema[Blank] {
       override def primaryKey: String = "id"
       override def typeName: String = "typeName"
+      override def attributes: List[String] = List("fjell")
     }
   }
 }
