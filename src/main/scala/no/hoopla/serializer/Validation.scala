@@ -2,26 +2,7 @@ package no.hoopla.serializer
 
 import scala.annotation.{StaticAnnotation, compileTimeOnly}
 import scala.reflect.macros.whitebox.Context
-import scala.collection.mutable.{ListBuffer, Stack}
 import scala.language.experimental.macros
-
-@compileTimeOnly("enable macro paradise to expand macro annotations.")
-class ValidateSerializable extends StaticAnnotation {
-  def macroTransform(annottees: Any*): Any = macro ???
-
-}
-
-object ValidateSerializable {
-  def impl(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
-    //def impl(c: CrossVersionContext)(annottees: c.Expr[Any]*): c.Expr[Any] = {
-    //import c.universe._
-
-    //annottees.map(_.tree) match {
-    //  case _ => c.abort(c.enclosingPosition, "Invalid annottee")
-    //}
-    ???
-  }
-}
 
 @compileTimeOnly("enable macro paradise to expand macro annotations.")
 class ValidateSchema extends StaticAnnotation {
@@ -38,7 +19,7 @@ object ValidateSchema {
       var primaryKeyName: String = ""
       var typeName: String = ""
       var attributes: List[String] = List()
-      var relationships: List[Relationship] = List()
+      var relationshipAttributes: List[String] = List()
 
       override def traverse(tree: Tree): Unit = tree match {
         case AppliedTypeTree(Ident(_), List(Ident(TypeName(btn)))) =>
@@ -53,41 +34,61 @@ object ValidateSchema {
           primaryKeyName = pk.asInstanceOf[String]
           super.traverse(tree)
 
+        case DefDef(Modifiers(_), TermName("attributes"), _, _, _, Apply(_, attributeList)) =>
+          attributes = attributeList.map {
+            case Literal(Constant(attribute: String)) => attribute
+            case _ => c.abort(c.enclosingPosition, "unable to parse attribute list. Use Constant Strings.")
+          }
+          super.traverse(tree)
+
+        case DefDef(Modifiers(_), TermName("relationships"), _, _, _, Apply(_, relationshipList)) =>
+          relationshipAttributes = relationshipList.map {
+            case Apply(_, List(_, Literal(Constant(relationshipAttribute: String)))) =>
+              relationshipAttribute
+
+            case Apply(_, List(_, Literal(Constant(relationshipAttribute: String)), _)) =>
+              relationshipAttribute
+
+            case t =>
+              c.abort(c.enclosingPosition, s"unable to parse relationship list. Use constant Strings. see: ${showRaw(t)}")
+          }
+          super.traverse(tree)
+
         case _ => super.traverse(tree)
       }
     }
-
     annottees.map(_.tree) match {
       case (objectDecl: ModuleDef) :: Nil => {
-        println(objectDecl.impl)
+        //println(showRaw(objectDecl))
         traverser.traverse(objectDecl)
 
         val baseTypeName: String = traverser.baseTypeName
         val primaryKeyName: String = traverser.primaryKeyName
         val typeName: String = traverser.typeName
         val attributes: List[String] = traverser.attributes
-        val relationships: List[Relationship] = traverser.relationships
+        val relationships: List[String] = traverser.relationshipAttributes
 
         val requiredAttributes: Set[String] =
-          attributes.toSet ++ relationships.map(_.attribute).toSet + primaryKeyName
+          attributes.toSet ++ relationships.toSet + primaryKeyName
 
         val k = c.asInstanceOf[scala.reflect.macros.contexts.Context]
         locally {
           import k.universe._
           val n = k.callsiteTyper.typed(q"??? : ${TypeName(traverser.baseTypeName)}").tpe
-          //println(attributes)
-          //println(requiredAttributes)
-          //requiredAttributes.foreach(attribute =>
-          //  println(s"hh: ${n.member(TermName(attribute))}"))
-          //println(n.member(TermName("id")))
+          println(n)
+          requiredAttributes.foreach(attribute =>
+            n.member(TermName(attribute)) match {
+              case NoSymbol => c.abort(c.enclosingPosition, s"Can't find attribute $attribute in $n")
+              case _        => ()
+            })
+
           println(n)
         }
         ???
       }
 
-      case something => {
-        println(something)
-        c.abort(c.enclosingPosition, "Invalid annottee, is your schema a case object?")
+      case t => {
+        c.abort(c.enclosingPosition, s"Invalid annottee, is your schema a case object?, see: ${showRaw(t)}")
       }
     }
   }

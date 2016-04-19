@@ -3,7 +3,7 @@ package no.hoopla.serializer
 class SchemaMacroValidationTest extends UnitSpec {
 
   // BlankSchema is a valid schema used for testing references
-  private[this] case class Blank(id: String)
+  private[this] case class Blank(id: String, fjell: Int, fjull: String)
 
   private[this] case class Person(id: String)
 
@@ -20,7 +20,9 @@ class SchemaMacroValidationTest extends UnitSpec {
     case object BlankSchema extends Schema[Blank] {
       override def primaryKey: String = "id"
       override def typeName: String = "typeName"
-      override def attributes: List[String] = List("fjell")
+      override def attributes: List[String] = List("fjell", "fjull")
+      //override def relationships: List[Relationship] =
+      //  List(Relationship(BlankSchema, "fjass"), Relationship(BlankSchema, "id", true))
     }
   }
 }
